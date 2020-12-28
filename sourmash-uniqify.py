@@ -1,9 +1,13 @@
 #! /usr/bin/env python
 """
-Peform an iterative, greedy clustering of a pile of genomes.
+Peform an iterative, greedy clustering of a pile of sourmash signatures.
 
 This is a practical alternative to a more principled clustering; see
 https://github.com/ctb/2017-sourmash-cluster
+
+Author: C. Titus Brown, github.com/ctb/, titus@idyll.org.
+
+This code is under CC0.
 """
 import sys
 import argparse
