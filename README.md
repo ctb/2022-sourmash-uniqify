@@ -2,6 +2,8 @@
 
 ref [sourmash](https://github.com/dib-lab/sourmash/)
 
+please post questions and comments and thoughts over at [sourmash#1265](https://github.com/dib-lab/sourmash/issues/1265)
+
 inspired by this sourmash issue: https://github.com/dib-lab/sourmash/issues/1251
 
 note: this requires sourmash 3.5.x or sourmash 4.x.
