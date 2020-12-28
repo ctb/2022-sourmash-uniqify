@@ -10,7 +10,12 @@ note: this requires sourmash 3.5.x or sourmash 4.x.
 
 1. click on the 'raw' link below for sourmash-uniqify.
 
-2. you can grab the script directly from the repo: `wget https://gist.github.com/ctb/85fe2efb23b70bbd72ea6a69750d1284/raw/5953c1025bab0c23e7a06f316fc17dbcec299720/sourmash-uniqify.py` - but this may not get the latest version...
+2. you can grab the script directly from the repo:
+
+```
+wget https://gist.github.com/ctb/85fe2efb23b70bbd72ea6a69750d1284/raw/5953c1025bab0c23e7a06f316fc17dbcec299720/sourmash-uniqify.py
+```
+- but this may not get the latest version...
 
 3. perhaps better, you can clone the repository:
 
