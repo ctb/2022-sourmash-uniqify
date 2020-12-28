@@ -32,7 +32,7 @@ wget https://gist.github.com/ctb/85fe2efb23b70bbd72ea6a69750d1284/archive/5953c1
 ## usage:
 
 ```
-./sourmash-uniqify [ multiple filenames, directory paths, or sourmash databases ]
+python3 sourmash-uniqify.py [ multiple filenames, directory paths, or sourmash databases ]
 ```
 
 Optional arguments:
