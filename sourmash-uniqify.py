@@ -29,6 +29,8 @@ def main():
     p.add_argument('--threshold', type=float, default=0.2)
     p.add_argument('--prefix', default='cluster',
                    help='output filename prefix (can include directories)')
+    p.add_argument('--max-containment', action='store_true',
+                   help="Use max containment instead of similarity to cluster.")
     args = p.parse_args()
 
     siglist = []
@@ -59,10 +61,14 @@ def main():
         cluster = []
         leftover = []
         for (sig_from, sig) in siglist:
-            if sig.similarity(founder) >= args.threshold:
+            if args.max_containment:
+                score = sig.max_containment(founder)
+            else:
+                score = sig.similarity(founder)
+
+            if score >= args.threshold:
                 cluster.append((sig_from, sig))
-                cluster_summary.append((sig_from, sig, pass_n,
-                                        'member'))
+                cluster_summary.append((sig_from, sig, pass_n, 'member'))
             else:
                 leftover.append((sig_from, sig))
 
