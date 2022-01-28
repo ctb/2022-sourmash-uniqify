@@ -27,10 +27,12 @@ def main():
     p.add_argument('--moltype', default='DNA')
     p.add_argument('--seed', type=int, default=1)
     p.add_argument('--threshold', type=float, default=0.2)
-    p.add_argument('--prefix', default='cluster',
-                   help='output filename prefix (can include directories)')
+    p.add_argument('--prefix', default='clust.',
+                   help='output filename prefix (can be a path)')
     p.add_argument('--max-containment', action='store_true',
                    help="Use max containment instead of similarity to cluster.")
+    p.add_argument('--merge-cluster-signatures', action='store_true',
+                   help="Merge cluster signatures into founder.")
     args = p.parse_args()
 
     siglist = []
@@ -75,18 +77,27 @@ def main():
         if cluster:
             notify(f'clustered {len(cluster)} signature(s) with founder sig {str(founder)[:30]}...')
 
-            prefix = f'{args.prefix}.cluster.{pass_n}'
-            with open(f'{prefix}.founder.sig', 'wt') as fp:
-                sourmash.save_signatures([founder], fp)
-            with open(f'{prefix}.cluster.sig', 'wt') as fp:
-                cluster_sigs = [ x[1] for x in cluster ]
-                sourmash.save_signatures(cluster_sigs, fp)
+            # output individual founder/cluster
+            prefix = f'{args.prefix}cluster.{pass_n}'
+            if not args.merge_cluster_signatures:
+                with open(f'{prefix}.founder.sig', 'wt') as fp:
+                    sourmash.save_signatures([founder], fp)
+                with open(f'{prefix}.cluster.sig', 'wt') as fp:
+                    cluster_sigs = [ x[1] for x in cluster ]
+                    sourmash.save_signatures(cluster_sigs, fp)
+                print(f'saved founder and {len(cluster)} signatures to {prefix}.*')
+            # merge!
+            else:
+                mh = founder.minhash.to_mutable()
+                for filename, ss in cluster:
+                    mh += ss.minhash
+                founder.minhash = mh
+                print(f'merged {len(cluster) - 1} sketches into founder and saved to {prefix}.*')
 
-            print(f'saved founder and {len(cluster)} signatures to {prefix}.*')
         else:
             notify(f'founder sig {str(founder)[:30]}... is a singleton.')
 
-            prefix = f'{args.prefix}.cluster.{pass_n}'
+            prefix = f'{args.prefix}cluster.{pass_n}'
             with open(f'{prefix}.founder.sig', 'wt') as fp:
                 sourmash.save_signatures([founder], fp)
             print(f'saved singleton signature to {prefix}.*')
@@ -96,7 +107,7 @@ def main():
 
     # output summary spreadsheet
     headers = ['origin_path', 'name', 'filename', 'md5sum', 'cluster', 'member_type']
-    csv_name = f'{args.prefix}.summary.csv'
+    csv_name = f'{args.prefix}summary.csv'
 
     with open(csv_name, 'wt') as fp:
         w = csv.writer(fp)
