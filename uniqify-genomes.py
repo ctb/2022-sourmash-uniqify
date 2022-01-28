@@ -1,9 +1,10 @@
 #! /usr/bin/env python
 """
-Peform an iterative, greedy clustering of a pile of sourmash signatures.
+Peform an iterative, greedy clustering of a pile of (genome) files, using
+sourmash signatures in memory to reduce memory consumption.
 
 This is a practical alternative to a more principled clustering; see
-https://github.com/ctb/2017-sourmash-cluster
+https://github.com/ctb/2017-sourmash-cluster for that.
 
 Author: C. Titus Brown, github.com/ctb/, titus@idyll.org.
 
