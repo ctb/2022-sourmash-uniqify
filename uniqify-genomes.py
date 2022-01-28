@@ -81,7 +81,7 @@ def main():
                 leftover.append((sig_from, sketch))
 
         if cluster:
-            notify(f'clustered {len(cluster)} signature(s) with founder {founder_from}')
+            notify(f'clustered {len(cluster)} genomes with founder {founder_from}')
 
             # output individual founder/cluster
             if args.merge_files:
