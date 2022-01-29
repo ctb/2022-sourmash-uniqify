@@ -63,7 +63,7 @@ def main():
 
     pass_n = 0
     while len(siglist):
-        notify(f'starting pass {pass_n+1}')
+        notify(f'starting pass {pass_n+1}; {len(siglist)} files remaining.')
         (founder_from, founder) = siglist.pop()
         cluster_summary.append((founder_from, founder, pass_n, 'founder'))
 
