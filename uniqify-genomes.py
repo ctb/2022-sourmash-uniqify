@@ -87,9 +87,11 @@ def main():
             # output individual founder/cluster
             if args.merge_files:
                 with gzip.open(f"{args.prefix}cluster.{pass_n}.fa.gz", "wt") as fp:
+                    print("writing", founder_from)
                     for record in screed.open(founder_from):
                         fp.write(f">{record.name}\n{record.sequence}\n")
                     for ff, _ in cluster:
+                        print("writing", ff)
                         for record in screed.open(ff):
                             fp.write(f">{record.name}\n{record.sequence}\n")
                 pass
@@ -111,6 +113,7 @@ def main():
 
             if args.merge_files:
                 with gzip.open(f"{args.prefix}cluster.{pass_n}.fa.gz", "wt") as fp:
+                    print("writing", founder_from)
                     for record in screed.open(founder_from):
                         fp.write(f">{record.name}\n{record.sequence}\n")
             else:
