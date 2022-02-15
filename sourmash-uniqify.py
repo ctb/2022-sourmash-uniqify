@@ -13,10 +13,15 @@ import sys
 import argparse
 import random
 import csv
+from collections import namedtuple
 
 import sourmash
 from sourmash import load_file_as_signatures
 from sourmash.logging import notify
+
+
+ClusterMember = namedtuple('ClusterMember',
+                           'founder_from, sigobj, cluster_num, member_type, cluster_type')
 
 
 def main():
@@ -58,7 +63,12 @@ def main():
     while len(siglist):
         notify(f'starting pass {pass_n+1}')
         (founder_from, founder) = siglist.pop()
-        cluster_summary.append((founder_from, founder, pass_n, 'founder'))
+        print('new founder', founder_from)
+        founder_info = ClusterMember(founder_from=founder_from,
+                                     sigobj=founder,
+                                     cluster_num=pass_n,
+                                     member_type='founder',
+                                     cluster_type='singleclust')
 
         cluster = []
         leftover = []
@@ -70,11 +80,23 @@ def main():
 
             if score >= args.threshold:
                 cluster.append((sig_from, sig))
-                cluster_summary.append((sig_from, sig, pass_n, 'member'))
+                member_info = ClusterMember(founder_from=sig_from,
+                                            sigobj=sig,
+                                            cluster_num=pass_n,
+                                            member_type='member',
+                                            cluster_type='multiclust')
+                cluster_summary.append(member_info)
             else:
                 leftover.append((sig_from, sig))
 
         if cluster:
+            member_info = ClusterMember(founder_from=founder_from,
+                                        sigobj=founder,
+                                        cluster_num=pass_n,
+                                        member_type='founder',
+                                        cluster_type='multiclust')
+            cluster_summary.append(member_info)
+
             notify(f'clustered {len(cluster)} signature(s) with founder sig {str(founder)[:30]}...')
 
             # output individual founder/cluster
@@ -96,6 +118,7 @@ def main():
 
         else:
             notify(f'founder sig {str(founder)[:30]}... is a singleton.')
+            cluster_summary.append(founder_info)
 
             prefix = f'{args.prefix}cluster.{pass_n}'
             with open(f'{prefix}.founder.sig', 'wt') as fp:
@@ -106,19 +129,23 @@ def main():
         pass_n += 1
 
     # output summary spreadsheet
-    headers = ['origin_path', 'name', 'filename', 'md5sum', 'cluster', 'member_type']
+    headers = ['origin_path', 'name', 'filename', 'md5sum', 'cluster_num', 'member_type', 'cluster_type']
     csv_name = f'{args.prefix}summary.csv'
 
-    with open(csv_name, 'wt') as fp:
-        w = csv.writer(fp)
-        w.writerow(headers)
+    with open(csv_name, 'w', newline="") as fp:
+        w = csv.DictWriter(fp, fieldnames=headers)
+        w.writeheader()
 
-        for (origin_path, sig, cluster_n, member_type) in cluster_summary:
-            name = str(sig)
-            filename = sig.filename
-            md5sum = sig.md5sum()
+        for member_info in cluster_summary:
+            d = dict(member_info._asdict())
+            del d['sigobj']
+            del d['founder_from']
+            d['origin_path'] = member_info.founder_from
+            d['name'] = str(member_info.sigobj)
+            d['filename'] = sig.filename
+            d['md5sum'] = sig.md5sum()
 
-            w.writerow([origin_path, name, filename, md5sum, cluster_n, member_type])
+            w.writerow(d)
 
     notify(f"wrote {len(cluster_summary)} entries to clustering summary at '{csv_name}'")
 
